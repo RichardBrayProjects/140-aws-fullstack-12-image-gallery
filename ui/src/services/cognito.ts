@@ -6,10 +6,9 @@
  * This persists across browser sessions, meaning that the user remains logged in
  * when the browser is closed and re-opened, until the Cognito token expires.
  *
- * If you would prefer this then you should create a localStorage.ts file:
- * - copy sessionStorage.ts,
- * - replace all instances of window.sessionStorage with window.localStorage
- * - Replace imports: change "./sessionStorage" to "./localStorage"
+ * To use localStorage instead: create a localStorage.ts that exports the same
+ * key constants, then in this file and any other caller use window.localStorage
+ * (and import keys from localStorage.ts) instead of window.sessionStorage.
  */
 
 import {
@@ -20,7 +19,13 @@ import {
   getCognitoLoginUrl,
   getCognitoLogoutUrl,
 } from "../utils/oauth-helpers";
-import { sessionStorage } from "../utils/sessionStorage";
+import {
+  TOKEN_STORAGE_KEY,
+  ID_TOKEN_STORAGE_KEY,
+  CODE_VERIFIER_KEY,
+  STATE_KEY,
+  SESSION_STORAGE_KEYS,
+} from "../utils/sessionStorage";
 import type { User } from "../types";
 import api from "./apiServer";
 
@@ -31,8 +36,8 @@ export async function startLogin(): Promise<void> {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
-  sessionStorage.setCodeVerifier(codeVerifier);
-  sessionStorage.setState(state);
+  window.sessionStorage.setItem(CODE_VERIFIER_KEY, codeVerifier);
+  window.sessionStorage.setItem(STATE_KEY, state);
 
   window.location.href = getCognitoLoginUrl(
     state,
@@ -47,8 +52,8 @@ export async function handleOAuthCallback(
   state: string,
 ): Promise<User> {
   const config = await api.getConfig();
-  const storedState = sessionStorage.getState();
-  const codeVerifier = sessionStorage.getCodeVerifier();
+  const storedState = window.sessionStorage.getItem(STATE_KEY);
+  const codeVerifier = window.sessionStorage.getItem(CODE_VERIFIER_KEY);
 
   if (!storedState || !codeVerifier) {
     throw new Error(
@@ -80,20 +85,20 @@ export async function handleOAuthCallback(
   }
 
   const tokens = await response.json();
-  sessionStorage.removeCodeVerifier();
-  sessionStorage.removeState();
+  window.sessionStorage.removeItem(CODE_VERIFIER_KEY);
+  window.sessionStorage.removeItem(STATE_KEY);
 
   if (!tokens.access_token) {
     throw new Error("No access token received");
   }
 
-  sessionStorage.setAccessToken(tokens.access_token);
+  window.sessionStorage.setItem(TOKEN_STORAGE_KEY, tokens.access_token);
 
   if (!tokens.id_token) {
     throw new Error("No ID token received");
   }
 
-  sessionStorage.setIdToken(tokens.id_token);
+  window.sessionStorage.setItem(ID_TOKEN_STORAGE_KEY, tokens.id_token);
 
   const user = decodeIdToken(tokens.id_token);
   if (!user) {
@@ -105,7 +110,7 @@ export async function handleOAuthCallback(
 
 export async function doLogout(): Promise<void> {
   const config = await api.getConfig();
-  sessionStorage.clearAll();
+  SESSION_STORAGE_KEYS.forEach((key) => window.sessionStorage.removeItem(key));
   window.location.href = getCognitoLogoutUrl(
     config.cognitoDomain,
     config.cognitoClientId,
@@ -113,7 +118,7 @@ export async function doLogout(): Promise<void> {
 }
 
 export function getUserFromStoredToken(): User | null {
-  const idToken = sessionStorage.getIdToken();
+  const idToken = window.sessionStorage.getItem(ID_TOKEN_STORAGE_KEY);
   if (!idToken) return null;
   return decodeIdToken(idToken);
 }

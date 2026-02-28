@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import api from "@/services/apiServer";
-import { sessionStorage } from "@/utils/sessionStorage";
+import { TOKEN_STORAGE_KEY } from "@/utils/sessionStorage";
 
 export default () => {
   const { user } = useAuth();
@@ -44,7 +44,7 @@ export default () => {
     setUploadError("");
 
     try {
-      const token = sessionStorage.getAccessToken();
+      const token = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
       if (token) {
         api.setAccessToken(token);
       }

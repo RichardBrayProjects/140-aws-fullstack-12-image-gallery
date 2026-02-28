@@ -2,7 +2,11 @@ import { createContext, ReactNode, useContext } from "react";
 import { useAuth as useAuthState } from "@/hooks/useAuth";
 import type { User } from "@/types";
 
-interface AuthContextType {
+/////////////
+// CONTEXT
+/////////////
+
+interface AuthContextValue {
   user: User | null;
   isLoggedIn: boolean;
   setUser: (user: User | null) => void;
@@ -11,20 +15,28 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+/////////////
+// HELPER
+/////////////
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
-  return context;
+  const value = useContext(AuthContext);
+  if (!value) throw new Error("useAuth must be used within an AuthProvider");
+  return value;
 };
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+/////////////
+// PROVIDER
+/////////////
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const value = useAuthState();
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

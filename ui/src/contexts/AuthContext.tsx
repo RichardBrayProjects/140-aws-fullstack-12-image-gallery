@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext } from "react";
-import { useAuth as useAuthState } from "@/hooks/useAuth";
 import type { User } from "@/types";
+import { useStoredAuth } from "@/hooks/useStoredAuth";
 
 /////////////
 // CONTEXT
@@ -15,7 +15,7 @@ interface AuthContextValue {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 /////////////
 // HELPER
@@ -35,8 +35,10 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const value = useAuthState();
+const AuthProvider = ({ children }: AuthProviderProps) => {
+  const value = useStoredAuth();
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export default AuthProvider;

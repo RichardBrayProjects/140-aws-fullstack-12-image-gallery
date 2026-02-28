@@ -5,7 +5,7 @@ import {
   SetStateAction,
   useContext,
 } from "react";
-import { useTheme as useThemeState } from "@/hooks/useTheme";
+import { useStoredTheme } from "@/hooks/useStoredTheme";
 
 /////////////
 // CONTEXT
@@ -37,7 +37,7 @@ interface ThemeProviderProps {
 }
 
 const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [dark, setDark] = useThemeState();
+  const [dark, setDark] = useStoredTheme();
 
   return (
     <ThemeContext.Provider value={{ dark, setDark }}>

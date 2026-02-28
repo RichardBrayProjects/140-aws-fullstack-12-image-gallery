@@ -6,7 +6,7 @@ import {
   getUserFromStoredToken,
 } from "@/services/cognito";
 
-export function useAuth() {
+export function useStoredAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const isLoggedIn = !!user;

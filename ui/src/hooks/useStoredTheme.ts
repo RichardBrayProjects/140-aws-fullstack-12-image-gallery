@@ -4,7 +4,7 @@ function getInitialValue() {
   return localStorage.getItem("theme") === "dark";
 }
 
-export function useTheme() {
+export function useStoredTheme() {
   const [dark, setDark] = useState(getInitialValue);
 
   useEffect(() => {

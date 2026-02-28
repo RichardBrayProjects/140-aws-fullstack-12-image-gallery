@@ -7,6 +7,8 @@
  *   const config = await api.getConfig();
  */
 
+import { TOKEN_STORAGE_KEY } from "../utils/sessionStorage";
+
 let API_BASE_URL: string;
 
 if (import.meta.env.VITE_API_SERVER_LOCATION === "local") {
@@ -41,23 +43,15 @@ interface UserResponse {
 class ApiClient {
   private baseUrl: string;
   private accessToken: string | null = null;
+  private tokenHydrated = false;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
   }
 
-  /**
-   * Set the access token for authenticated requests
-   */
   setAccessToken(token: string | null): void {
     this.accessToken = token;
-  }
-
-  /**
-   * Get the current access token
-   */
-  getAccessToken(): string | null {
-    return this.accessToken;
+    this.tokenHydrated = true;
   }
 
   /**
@@ -74,7 +68,10 @@ class ApiClient {
       ...(options.headers as Record<string, string>),
     };
 
-    // Add authorization header if we have an access token
+    if (!this.tokenHydrated) {
+      this.accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      this.tokenHydrated = true;
+    }
     if (this.accessToken) {
       headers["Authorization"] = `Bearer ${this.accessToken}`;
     }

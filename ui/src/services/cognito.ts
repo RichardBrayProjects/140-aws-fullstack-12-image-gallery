@@ -93,6 +93,7 @@ export async function handleOAuthCallback(
   }
 
   window.sessionStorage.setItem(TOKEN_STORAGE_KEY, tokens.access_token);
+  api.setAccessToken(tokens.access_token);
 
   if (!tokens.id_token) {
     throw new Error("No ID token received");
@@ -110,6 +111,7 @@ export async function handleOAuthCallback(
 
 export async function doLogout(): Promise<void> {
   const config = await api.getConfig();
+  api.setAccessToken(null);
   SESSION_STORAGE_KEYS.forEach((key) => window.sessionStorage.removeItem(key));
   window.location.href = getCognitoLogoutUrl(
     config.cognitoDomain,

@@ -5,11 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 export function ThemeToggle() {
   const { dark, setDark } = useTheme();
 
-  const toggle = () => {
-    const newDark = !dark;
-    setDark(newDark);
-    document.documentElement.classList.toggle('dark', newDark);
-  };
+  const toggle = () => setDark(!dark);
 
   return (
     <Button variant='ghost' size='icon' onClick={toggle}>

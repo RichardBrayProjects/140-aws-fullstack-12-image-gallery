@@ -21,7 +21,7 @@ import {
   getCognitoLogoutUrl,
 } from "../utils/oauth-helpers";
 import { sessionStorage } from "../utils/sessionStorage";
-import type { OAuthUser } from "../types";
+import type { User } from "../types";
 import api from "./apiServer";
 
 export async function startLogin(): Promise<void> {
@@ -45,7 +45,7 @@ export async function startLogin(): Promise<void> {
 export async function handleOAuthCallback(
   code: string,
   state: string,
-): Promise<OAuthUser> {
+): Promise<User> {
   const config = await api.getConfig();
   const storedState = sessionStorage.getState();
   const codeVerifier = sessionStorage.getCodeVerifier();
@@ -112,7 +112,7 @@ export async function doLogout(): Promise<void> {
   );
 }
 
-export function getUserFromStoredToken(): OAuthUser | null {
+export function getUserFromStoredToken(): User | null {
   const idToken = sessionStorage.getIdToken();
   if (!idToken) return null;
   return decodeIdToken(idToken);

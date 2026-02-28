@@ -23,12 +23,7 @@ export default ({ searchQuery, onSearchQueryChange }: HeaderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { authenticated, login, logout } = useAuth();
-
-  const logoutUser = async () => {
-    logout();
-  };
-
+  const { isLoggedIn, login, logout } = useAuth();
   const goToProfile = () => navigate("/profile");
 
   return (
@@ -86,8 +81,8 @@ export default ({ searchQuery, onSearchQueryChange }: HeaderProps) => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-              {authenticated ? (
-                <DropdownMenuItem onClick={logoutUser}>Logout</DropdownMenuItem>
+              {isLoggedIn ? (
+                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
               ) : (
                 <DropdownMenuItem onClick={login}>Login</DropdownMenuItem>
               )}

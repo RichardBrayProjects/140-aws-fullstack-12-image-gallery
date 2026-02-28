@@ -1,12 +1,26 @@
-import { createContext, useContext, ReactNode } from "react";
-import { useDarkness } from "@/hooks/useDarkness";
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useContext,
+} from "react";
+import { useTheme as useThemeState } from "@/hooks/useTheme";
+
+/////////////
+// CONTEXT
+/////////////
 
 interface ThemeContextType {
   dark: boolean;
-  setDark: (value: boolean) => void;
+  setDark: Dispatch<SetStateAction<boolean>>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+/////////////
+// HELPER
+/////////////
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
@@ -14,11 +28,22 @@ export const useTheme = () => {
   return context;
 };
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [dark, setDark] = useDarkness();
+/////////////
+// PROVIDER
+/////////////
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const [dark, setDark] = useThemeState();
+
   return (
     <ThemeContext.Provider value={{ dark, setDark }}>
       {children}
     </ThemeContext.Provider>
   );
 };
+
+export default ThemeProvider;

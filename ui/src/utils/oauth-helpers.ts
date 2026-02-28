@@ -1,4 +1,4 @@
-import { OAuthUser } from "@/types";
+import type { User } from "@/types";
 
 export function getCognitoLoginUrl(
   state: string,
@@ -66,7 +66,7 @@ export function generateState(): string {
   );
 }
 
-export function decodeIdToken(idToken: string): OAuthUser | null {
+export function decodeIdToken(idToken: string): User | null {
   try {
     const payload = idToken.split(".")[1];
     const decoded = JSON.parse(atob(payload));
